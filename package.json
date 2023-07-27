@@ -1,0 +1,74 @@
+{
+    "private": true,
+    "scripts": {
+        "dev": "npm run development",
+        "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+        "watch": "npm run development -- --watch",
+        "watch-poll": "npm run watch -- --watch-poll",
+        "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
+        "prod": "npm run production",
+        "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.7.5",
+        "@babel/core": "^7.7.5",
+        "@babel/preset-env": "^7.7.6",
+        "@mdi/font": "^4.9.95",
+        "axios": "^0.19.2",
+        "babel-eslint": "^10.0.3",
+        "bootstrap": "^4.5.3",
+        "cross-env": "^5.1",
+        "eslint": "^5.16.0",
+        "eslint-plugin-vue": "^5.2.0",
+        "jquery": "^3.5.1",
+        "laravel-mix": "5.0.9",
+        "lodash": "^4.17.20",
+        "popper.js": "^1.16.1",
+        "resolve-url-loader": "2.3.1",
+        "sass": "^1.30.0",
+        "sass-loader": "7.*",
+        "vue": "^2.6.12",
+        "vue-axios": "^2.1.5",
+        "vue-router": "^3.4.9",
+        "vue-template-compiler": "^2.6.12",
+        "vuex": "^3.6.0"
+    },
+    "dependencies": {
+        "babel-polyfill": "^6.26.0",
+        "chart.js": "^2.9.4",
+        "jspdf": "^1.5.3",
+        "jspdf-autotable": "^3.5.13",
+        "moment": "^2.29.1",
+        "moment-business-days": "^1.2.0",
+        "v-mask": "^2.2.3",
+        "velocity-animate": "^1.5.2",
+        "vue-chartjs": "^3.5.1",
+        "vue-html-to-paper": "^1.3.1",
+        "vue-notification": "^1.3.20",
+        "vue-recaptcha-v3": "^1.9.0",
+        "vuedraggable": "^2.24.3",
+        "vuetify": "^2.3.21",
+        "vuex-router-sync": "^5.0.0"
+    },
+    "eslintConfig": {
+        "root": true,
+        "env": {
+            "node": true
+        },
+        "extends": [
+            "plugin:vue/essential",
+            "eslint:recommended"
+        ],
+        "rules": {
+            "no-console": "off"
+        },
+        "parserOptions": {
+            "parser": "babel-eslint"
+        }
+    },
+    "browserslist": [
+        "last 1 version",
+        "> 1%",
+        "not ie <= 8"
+    ]
+}

@@ -1,0 +1,185 @@
+<template>
+    <div>
+        <div class="container">
+            <template v-if="complate===1">
+                <v-card
+                    class="overflow-hidden"
+                    color="lighten-1"
+                >
+                    <v-toolbar
+                        flat
+                    >
+                        <v-icon>mdi-account-box-multiple-outline</v-icon>
+                        <v-toolbar-title class="title">{{ anket.ad }}</v-toolbar-title>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                        @click="save"
+                            color="darken-3"
+                            fab
+                            small
+                            class="mr-2"
+                        >
+                            <v-icon>mdi-content-save</v-icon>
+                        </v-btn>
+                    </v-toolbar>
+                    <v-card-text>
+                        <template v-for="(item, index) in anketSorulari">
+                            <div :key="index" class="row">
+                                <div class="col-8">
+                                    <span v-if="item.soru_tipi === 'VRating' || item.soru_tipi === 'VSwitch'" class="caption">{{ (item.required)?item.soru + '*':item.soru }}</span>
+                                    <component
+                                            :key="item.soru_tipi + index"
+                                            :is="componentIs(item.soru_tipi)"
+                                            :items="item.soru_tipi==='VSelect'?item.detay:''"
+                                            item-value="secenek"
+                                            item-text="secenek"
+                                            v-bind:outlined= "true"
+                                            v-bind:label= "(item.required)?item.soru + '*':item.soru"
+                                            v-model="item.cevap"
+                                    >
+                                    <template v-if="item.soru_tipi==='VRadio'||item.soru_tipi==='VSwitch'">
+                                        <template v-for="(item2, index2) in item.detay">
+                                            <component
+                                                :key="item2.tip + index2"
+                                                :is="(item2.tip === 'VTextField')?'VRadio':item2.tip"
+                                                v-bind:value= "item2.secenek"
+                                                v-bind:label= "item2.secenek"
+                                                v-bind:outlined= "true"
+                                                @change="(item2.tip === 'VTextField')?item.text=1:item.text=0"
+                                            >
+                                            </component>
+                                            <component v-if="(item2.tip === 'VTextField')&&(item.text)"
+                                                :key="item2.tip + index2 + 'text'"
+                                                :is="item2.tip"
+                                                v-bind:label= "item2.secenek"
+                                                v-bind:outlined= "true"
+                                                v-model="item.digerCevap"
+                                            >
+                                            </component>
+                                        </template>
+                                    </template>
+                                    </component>
+                                </div>
+                            </div>
+                            <v-divider></v-divider>
+                        </template>
+                    </v-card-text>
+                </v-card>
+            </template>
+            <template v-else-if="complate===2">
+                <v-card
+                    class="overflow-hidden"
+                    color="lighten-1"
+                >
+                    <v-card-text>
+                        Bu anket
+                            {{ anket.updated_at }}
+                        tarihinde dolduruldu
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-btn
+                            outlined
+                            rounded
+                            text
+                            :href="`/isyeriegitimi/bitis-anketi/firma/` + this.editId + `/cevaplar`"
+                        >
+                            Anket Cevapları
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </template>
+            <template v-else-if="complate===0">
+                <v-progress-linear
+                indeterminate
+                color="cyan"
+                ></v-progress-linear>
+            </template>
+        </div>
+
+        <v-snackbar
+            v-model="snackbar"
+            :color="color"
+            :top='true'
+        >
+            {{ snackbarMessage }}
+            <v-btn
+                dark
+                text
+                @click="snackbar = false"
+            >
+                Kapat
+            </v-btn>
+        </v-snackbar>
+
+    </div>
+</template>
+
+<script>
+    export default {
+        components:{
+        },
+        data: () => ({
+            snackbarMessage: 'Bir sorun oluştu',
+            snackbar: false,
+            color: 'general',
+            anket: [],
+            anketSorulari: [],
+            complate: 0,
+            editId: 0,
+        }),
+        mounted(){
+            this.getData();
+        },
+
+        methods: {
+            getData () {
+                this.editId = this.$route.params.id;
+                api.get('/isyeriegitimi/bitis-anketi/firma/' + this.editId + '/edit')
+                    .then(response => {
+                        if(response.data.success) {
+                            this.anket = response.data.data;
+
+                            if(response.data.data.anket_sorular){
+                                this.anketSorulari = response.data.data.anket_sorular;
+                                this.complate = 1;
+                            }
+                            else{
+                                this.complate = 2;
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        this.color = 'error';
+                        this.snackbar = true;
+                        this.snackbarMessage = err.response.data.message;
+                    });
+            },
+            save () {
+                this.anket.anket_sorular = this.anketSorulari;
+                console.log(this.anket.anket_sorular);
+                api.put('/isyeriegitimi/bitis-anketi/firma/' + this.editId, this.anket)
+                    .then(response => {
+                        if(response.data.success) {
+                            this.snackbar = true;
+                            this.snackbarMessage = 'İşlem Başarılı';
+                            this.anket = response.data.data;
+                            this.complate = 2;
+                        }
+                    })
+                    .catch(error => {
+                        this.snackbar = true;
+                        this.snackbarMessage = 'İşlem Başarısız, Lütfen Bilgileri Kontrol Ediniz';
+                    })
+            },
+            componentIs(type){
+                if(type==='VRadio')
+                    return 'VRadioGroup';
+                else if(type==='VSwitch')
+                    return 'VSheet';
+                else
+                    return type;
+            },
+
+        },
+    }
+</script>
